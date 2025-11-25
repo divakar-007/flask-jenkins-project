@@ -2,22 +2,39 @@ pipeline {
     agent any
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout Code') {
             steps {
-                git 'https://github.com/your-username/flask-jenkins-project.git'
+                git branch: 'main',
+                    credentialsId: 'github_divakar-007_credentials',
+                    url: 'https://github.com/divakar-007/flask-jenkins-project.git'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Create Virtual Environment') {
             steps {
-                bat 'pip install -r requirements.txt'
+                bat '"C:\\Users\\DIVAKAR\\AppData\\Local\\Programs\\Python\\Python39\\python.exe" -m venv venv'
             }
         }
 
-        stage('Run Flask App') {
+        stage('Activate & Install Requirements') {
             steps {
-                bat 'python app.py'
+                bat 'venv\\Scripts\\activate && pip install -r requirements.txt'
             }
+        }
+
+        stage('Run Flask App (Test Mode)') {
+            steps {
+                bat 'venv\\Scripts\\activate && python app.py'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build Successful! Flask App Pipeline Completed.'
+        }
+        failure {
+            echo '❌ Build Failed! Please check logs.'
         }
     }
 }
